@@ -1,38 +1,36 @@
-<!doctype html>
-<html lang="ru">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Islamic Spy 400</title>
-  <link rel="manifest" href="manifest.json">
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container">
-    <h1>Islamic Spy 400</h1>
-    <p class="subtitle">Исламская версия игры «Шпион». Русский интерфейс. (Offline)</p>
+const CACHE_NAME = 'islamic-spy-v2'; // v=2 kesh versiyasi
+const urlsToCache = [
+  'index.html?v=2',
+  'style.css?v=2',
+  'app.js?v=2',
+  'names.js?v=2',
+  'manifest.json?v=2'
+];
 
-    <div class="controls">
-      <label for="num">Количество игроков (3–12):</label>
-      <input id="num" type="number" min="3" max="12" value="4"/>
-      <button id="startBtn">Начать игру</button>
-      <button id="resetBtn">Сбросить</button>
-    </div>
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    })
+  );
+});
 
-    <div id="playersArea" class="playersArea"></div>
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE_NAME)
+          .map((name) => caches.delete(name))
+      );
+    })
+  );
+});
 
-    <div class="notes">
-      <p>Каждый игрок нажимает <b>«Получить роль»</b> и увидит: либо имя, либо <b>«Вы — Шпион!»</b>.</p>
-      <p>Имена случайны из базы (400).</p>
-    </div>
-  </div>
-
-  <script src="names.js"></script>
-  <script src="app.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js');
-    }
-  </script>
-</body>
-</html>
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request);
+    })
+  );
+});
