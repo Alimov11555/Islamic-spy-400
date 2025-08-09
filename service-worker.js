@@ -1,10 +1,10 @@
-// v6 — keshni majburan yangilash
-const CACHE_NAME = 'islamic-spy-v6';
+// v7 — keshni yangilash
+const CACHE_NAME = 'islamic-spy-v7';
 const STATIC_ASSETS = [
   './',
-  'index.html?v=6',
-  'style.css?v=6',
-  'names.js?v=6'
+  'index.html?v=7',
+  'style.css?v=7',
+  'names.js?v=7'
 ];
 
 self.addEventListener('install', e => {
