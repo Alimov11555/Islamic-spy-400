@@ -4,8 +4,8 @@
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Islamic Spy 400</title>
-  <link rel="manifest" href="manifest.json?v=3">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="manifest" href="manifest.json?v=4">
+  <link rel="stylesheet" href="style.css?v=4">
   <meta http-equiv="Cache-Control" content="no-store, must-revalidate"/>
 </head>
 <body>
@@ -18,16 +18,30 @@
       <input id="num" type="number" min="3" max="12" value="4"/>
       <button id="startBtn">Начать игру</button>
       <button id="resetBtn">Сбросить</button>
+      <button id="forceBtn" title="Обновить">Force Update</button>
     </div>
 
     <div id="playersArea" class="playersArea"></div>
   </div>
 
-  <script src="names.js?v=3"></script>
-  <script src="app.js?v=3"></script>
+  <script src="names.js?v=4"></script>
+  <script src="app.js?v=4"></script>
   <script>
+    // Force Update tugmasi: SW va keshlarni tozalab, qayta yuklaydi
+    document.getElementById('forceBtn').addEventListener('click', async ()=> {
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map(r => r.unregister()));
+      }
+      location.reload(true);
+    });
+
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js?v=3');
+      navigator.serviceWorker.register('./service-worker.js?v=4');
     }
   </script>
 </body>
