@@ -1,5 +1,4 @@
-// v4 — BARCHA O'YINCHIGA BIR XIL SO'Z + 1 ta SHPION.
-// Ko'rish 3s, o'zi yopiladi, tugma bloklanadi.
+// v5 — Modal karta ko'rinishida, hammaga bir xil so'z + 1 ta shpion
 
 if (typeof NAMES === 'undefined' || !Array.isArray(NAMES)) {
   alert('Ошибка: names.js не загружен.');
@@ -24,7 +23,7 @@ function startGame(){
     alert(`Количество игроков должно быть от ${MIN_PLAYERS} до ${MAX_PLAYERS}`);
     return;
   }
-  const topic = NAMES[Math.floor(Math.random()*NAMES.length)]; // BIR xil so'z
+  const topic = NAMES[Math.floor(Math.random()*NAMES.length)]; // bir xil so'z
   const spyIndex = Math.floor(Math.random()*n);
   game = { topic, spyIndex, shown: new Set(), n };
   renderPlayers(n);
@@ -44,7 +43,6 @@ function renderPlayers(n){
       <div><strong>Игрок ${i+1}</strong></div>
       <div>
         <button data-i="${i}" class="roleBtn">Получить роль</button>
-        <span id="role${i}" style="margin-left:8px;color:#333"></span>
       </div>`;
     playersArea.appendChild(div);
   }
@@ -52,20 +50,36 @@ function renderPlayers(n){
   document.querySelectorAll('.roleBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const idx = parseInt(btn.dataset.i);
-      showRoleOnce(idx, btn);
+      showRoleModal(idx, btn);
     });
   });
 }
 
-function showRoleOnce(i, btn){
+function showRoleModal(i, btn){
   if (!game || game.shown.has(i)) return;
-  const span = document.getElementById('role'+i);
-  if (!span) return;
 
-  span.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
+  // Modal yaratish
+  const modal = document.createElement('div');
+  modal.style.position = 'fixed';
+  modal.style.top = 0;
+  modal.style.left = 0;
+  modal.style.width = '100%';
+  modal.style.height = '100%';
+  modal.style.background = 'rgba(0,0,0,0.8)';
+  modal.style.display = 'flex';
+  modal.style.alignItems = 'center';
+  modal.style.justifyContent = 'center';
+  modal.style.zIndex = '9999';
+  modal.style.color = '#fff';
+  modal.style.fontSize = '2rem';
+  modal.style.fontWeight = 'bold';
 
+  modal.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
+  document.body.appendChild(modal);
+
+  // 3 soniyadan keyin yopish
   setTimeout(()=>{
-    span.textContent = '';     // yopish
+    modal.remove();
     btn.textContent = 'Показано';
     btn.disabled = true;
     game.shown.add(i);
