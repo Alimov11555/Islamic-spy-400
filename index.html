@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Islamic Spy 400</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Islamic Spy 400</h1>
+    <p class="subtitle">Исламская версия игры «Шпион». Русский интерфейс. (Offline)</p>
+
+    <div class="controls">
+      <label for="num">Количество игроков (3–12):</label>
+      <input id="num" type="number" min="3" max="12" value="4"/>
+      <button id="startBtn">Начать игру</button>
+      <button id="resetBtn">Сбросить</button>
+    </div>
+
+    <div id="playersArea" class="playersArea"></div>
+
+    <div class="notes">
+      <p>Каждый игрок нажимает <b>«Получить роль»</b> и увидит: либо имя, либо <b>«Вы — Шпион!»</b>.</p>
+      <p>Имена случайны из базы (400).</p>
+    </div>
+  </div>
+
+  <script src="names.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-worker.js');
+    }
+  </script>
+</body>
+</html>
