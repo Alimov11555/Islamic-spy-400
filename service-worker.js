@@ -1,8 +1,16 @@
-const CACHE_NAME = 'islamic-spy-v2'; // versiyani oshirdik
-const urlsToCache = ['./','index.html','style.css','app.js','names.js','manifest.json'];
+// v3 — keshni yangilash va eskilarni tozalash
+const CACHE_NAME = 'islamic-spy-v3';
+const urlsToCache = [
+  './',
+  'index.html?v=3',
+  'style.css?v=3',
+  'app.js?v=3',
+  'names.js?v=3',
+  'manifest.json?v=3'
+];
 
 self.addEventListener('install', e => {
-  self.skipWaiting(); // eski SW ni kutmay, yangisini ishga tushiradi
+  self.skipWaiting();
   e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsToCache)));
 });
 
