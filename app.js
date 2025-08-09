@@ -1,4 +1,4 @@
-// v5 — Modal karta ko'rinishida, hammaga bir xil so'z + 1 ta shpion
+// v6 — Modal karta, hammaga bir xil so'z, 1 ta shpion, 3s ko'rish
 
 if (typeof NAMES === 'undefined' || !Array.isArray(NAMES)) {
   alert('Ошибка: names.js не загружен.');
@@ -12,7 +12,7 @@ const resetBtn = document.getElementById('resetBtn');
 const numInput = document.getElementById('num');
 const playersArea = document.getElementById('playersArea');
 
-let game = null; // {topic, spyIndex, shown:Set, n}
+let game = null;
 
 startBtn.addEventListener('click', startGame);
 resetBtn.addEventListener('click', resetGame);
@@ -23,7 +23,7 @@ function startGame(){
     alert(`Количество игроков должно быть от ${MIN_PLAYERS} до ${MAX_PLAYERS}`);
     return;
   }
-  const topic = NAMES[Math.floor(Math.random()*NAMES.length)]; // bir xil so'z
+  const topic = NAMES[Math.floor(Math.random()*NAMES.length)];
   const spyIndex = Math.floor(Math.random()*n);
   game = { topic, spyIndex, shown: new Set(), n };
   renderPlayers(n);
@@ -58,26 +58,17 @@ function renderPlayers(n){
 function showRoleModal(i, btn){
   if (!game || game.shown.has(i)) return;
 
-  // Modal yaratish
   const modal = document.createElement('div');
-  modal.style.position = 'fixed';
-  modal.style.top = 0;
-  modal.style.left = 0;
-  modal.style.width = '100%';
-  modal.style.height = '100%';
-  modal.style.background = 'rgba(0,0,0,0.8)';
-  modal.style.display = 'flex';
-  modal.style.alignItems = 'center';
-  modal.style.justifyContent = 'center';
-  modal.style.zIndex = '9999';
-  modal.style.color = '#fff';
-  modal.style.fontSize = '2rem';
-  modal.style.fontWeight = 'bold';
-
+  modal.style.cssText = `
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9); display: flex;
+    align-items: center; justify-content: center;
+    color: #fff; font-size: 2rem; font-weight: bold;
+    z-index: 9999;
+  `;
   modal.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
   document.body.appendChild(modal);
 
-  // 3 soniyadan keyin yopish
   setTimeout(()=>{
     modal.remove();
     btn.textContent = 'Показано';
