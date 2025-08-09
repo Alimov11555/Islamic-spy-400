@@ -1,15 +1,16 @@
-// v6 — Modal karta, hammaga bir xil so'z, 1 ta shpion, 3s ko'rish
+// v7 — Spy sonini tanlash, modal 2s ko'rinadi
 
 if (typeof NAMES === 'undefined' || !Array.isArray(NAMES)) {
   alert('Ошибка: names.js не загружен.');
 }
 
 const MIN_PLAYERS = 3, MAX_PLAYERS = 12;
-const VIEW_MS = 3000;
+const VIEW_MS = 2000;
 
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 const numInput = document.getElementById('num');
+const spyCountSelect = document.getElementById('spyCount');
 const playersArea = document.getElementById('playersArea');
 
 let game = null;
@@ -23,9 +24,18 @@ function startGame(){
     alert(`Количество игроков должно быть от ${MIN_PLAYERS} до ${MAX_PLAYERS}`);
     return;
   }
+
+  const spyCount = Math.min(parseInt(spyCountSelect.value), n - 1);
   const topic = NAMES[Math.floor(Math.random()*NAMES.length)];
-  const spyIndex = Math.floor(Math.random()*n);
-  game = { topic, spyIndex, shown: new Set(), n };
+
+  // Shpion indekslarini tanlash
+  let spyIndices = [];
+  while (spyIndices.length < spyCount) {
+    let rnd = Math.floor(Math.random()*n);
+    if (!spyIndices.includes(rnd)) spyIndices.push(rnd);
+  }
+
+  game = { topic, spyIndices, shown: new Set(), n };
   renderPlayers(n);
 }
 
@@ -59,14 +69,8 @@ function showRoleModal(i, btn){
   if (!game || game.shown.has(i)) return;
 
   const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.9); display: flex;
-    align-items: center; justify-content: center;
-    color: #fff; font-size: 2rem; font-weight: bold;
-    z-index: 9999;
-  `;
-  modal.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
+  modal.className = 'modalCard';
+  modal.textContent = game.spyIndices.includes(i) ? 'Вы — Шпион!' : game.topic;
   document.body.appendChild(modal);
 
   setTimeout(()=>{
