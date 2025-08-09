@@ -1,17 +1,16 @@
-// v3 — keshni yangilash va eskilarni tozalash
-const CACHE_NAME = 'islamic-spy-v3';
-const urlsToCache = [
+// v4 — network-first JS/HTML, keshni yangilash
+const CACHE_NAME = 'islamic-spy-v4';
+const STATIC_ASSETS = [
   './',
-  'index.html?v=3',
-  'style.css?v=3',
-  'app.js?v=3',
-  'names.js?v=3',
-  'manifest.json?v=3'
+  'index.html?v=4',
+  'style.css?v=4',
+  'names.js?v=4',
+  'manifest.json?v=4'
 ];
 
 self.addEventListener('install', e => {
   self.skipWaiting();
-  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(urlsToCache)));
+  e.waitUntil(caches.open(CACHE_NAME).then(c => c.addAll(STATIC_ASSETS)));
 });
 
 self.addEventListener('activate', e => {
@@ -22,6 +21,23 @@ self.addEventListener('activate', e => {
   );
 });
 
+// HTML/JS uchun network-first, boshqalarga cache-first
 self.addEventListener('fetch', e => {
-  e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+  const url = e.request.url;
+  const isHTML = url.endsWith('.html') || url.includes('index.html');
+  const isJS   = url.endsWith('.js');
+
+  if (isHTML || isJS) {
+    e.respondWith(
+      fetch(e.request).then(resp => {
+        const copy = resp.clone();
+        caches.open(CACHE_NAME).then(c => c.put(e.request, copy));
+        return resp;
+      }).catch(() => caches.match(e.request))
+    );
+  } else {
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    );
+  }
 });
