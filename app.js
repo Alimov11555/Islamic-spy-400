@@ -1,12 +1,12 @@
-// v3 — Hamma uchun BIR xil so'z + 1 ta shpion.
-// Ko'rsatkich 3 soniyadan keyin avtomatik yopiladi va tugma bloklanadi.
+// v4 — BARCHA O'YINCHIGA BIR XIL SO'Z + 1 ta SHPION.
+// Ko'rish 3s, o'zi yopiladi, tugma bloklanadi.
 
 if (typeof NAMES === 'undefined' || !Array.isArray(NAMES)) {
   alert('Ошибка: names.js не загружен.');
 }
 
 const MIN_PLAYERS = 3, MAX_PLAYERS = 12;
-const VIEW_MS = 3000; // 3s ko‘rsatish
+const VIEW_MS = 3000;
 
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
@@ -65,9 +65,9 @@ function showRoleOnce(i, btn){
   span.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
 
   setTimeout(()=>{
-    span.textContent = '';     // avtomatik yopish
+    span.textContent = '';     // yopish
     btn.textContent = 'Показано';
-    btn.disabled = true;       // qayta ko'rsatmaydi
+    btn.disabled = true;
     game.shown.add(i);
   }, VIEW_MS);
 }
