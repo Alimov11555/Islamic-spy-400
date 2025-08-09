@@ -1,19 +1,22 @@
-// app.js — “Islamic Spy” (hamma uchun bitta so‘z, bitta shpion)
-// Ruscha UI, 3–12 o‘yinchi, rol ko‘rinsa 3s ko‘rinib, o‘zi yopiladi (1 marta)
+// v3 — Hamma uchun BIR xil so'z + 1 ta shpion.
+// Ko'rsatkich 3 soniyadan keyin avtomatik yopiladi va tugma bloklanadi.
 
 if (typeof NAMES === 'undefined' || !Array.isArray(NAMES)) {
-  alert('Ошибка: names.js не загружен.'); 
+  alert('Ошибка: names.js не загружен.');
 }
 
 const MIN_PLAYERS = 3, MAX_PLAYERS = 12;
-const VIEW_MS = 3000; // Rol ko‘rinish vaqti (ms). Xohlasangiz 2000 yoki 4000 qiling.
+const VIEW_MS = 3000; // 3s ko‘rsatish
 
 const startBtn = document.getElementById('startBtn');
 const resetBtn = document.getElementById('resetBtn');
 const numInput = document.getElementById('num');
 const playersArea = document.getElementById('playersArea');
 
-let currentGame = null; // {topic, spyIndex, shown: Set()}
+let game = null; // {topic, spyIndex, shown:Set, n}
+
+startBtn.addEventListener('click', startGame);
+resetBtn.addEventListener('click', resetGame);
 
 function startGame(){
   const n = parseInt(numInput.value) || 4;
@@ -21,22 +24,20 @@ function startGame(){
     alert(`Количество игроков должно быть от ${MIN_PLAYERS} до ${MAX_PLAYERS}`);
     return;
   }
-  if (NAMES.length === 0) {
-    alert('База имен пуста.');
-    return;
-  }
-
-  // --- MUHIM O‘ZGARISH: endi barchaga bitta so‘z beramiz ---
-  const topic = NAMES[Math.floor(Math.random()*NAMES.length)]; // bitta nom
+  const topic = NAMES[Math.floor(Math.random()*NAMES.length)]; // BIR xil so'z
   const spyIndex = Math.floor(Math.random()*n);
-
-  currentGame = { topic, spyIndex, shown: new Set(), n };
+  game = { topic, spyIndex, shown: new Set(), n };
   renderPlayers(n);
+}
+
+function resetGame(){
+  playersArea.innerHTML = '';
+  game = null;
 }
 
 function renderPlayers(n){
   playersArea.innerHTML = '';
-  for (let i = 0; i < n; i++){
+  for (let i=0;i<n;i++){
     const div = document.createElement('div');
     div.className = 'playerCard';
     div.innerHTML = `
@@ -44,12 +45,11 @@ function renderPlayers(n){
       <div>
         <button data-i="${i}" class="roleBtn">Получить роль</button>
         <span id="role${i}" style="margin-left:8px;color:#333"></span>
-      </div>
-    `;
+      </div>`;
     playersArea.appendChild(div);
   }
 
-  Array.from(document.getElementsByClassName('roleBtn')).forEach(btn=>{
+  document.querySelectorAll('.roleBtn').forEach(btn=>{
     btn.addEventListener('click', ()=>{
       const idx = parseInt(btn.dataset.i);
       showRoleOnce(idx, btn);
@@ -57,28 +57,17 @@ function renderPlayers(n){
   });
 }
 
-// Har bir o‘yinchi rolini Faqat 1 marta ko‘ra oladi, 3s dan keyin avtomatik yopiladi
-function showRoleOnce(i, buttonEl){
-  if (!currentGame) return;
-  if (currentGame.shown.has(i)) return; // allaqachon ko‘rgan bo‘lsa, qayta bermaymiz
-
+function showRoleOnce(i, btn){
+  if (!game || game.shown.has(i)) return;
   const span = document.getElementById('role'+i);
   if (!span) return;
 
-  const isSpy = (i === currentGame.spyIndex);
-  span.textContent = isSpy ? 'Вы — Шпион!' : currentGame.topic;
+  span.textContent = (i === game.spyIndex) ? 'Вы — Шпион!' : game.topic;
 
-  // 3 sekunddan keyin avtomatik yashirish va tugmani bloklash
   setTimeout(()=>{
-    span.textContent = '';          // yopamiz
-    buttonEl.textContent = 'Показано';
-    buttonEl.disabled = true;       // endi qayta ko‘rsatmaydi
-    currentGame.shown.add(i);
+    span.textContent = '';     // avtomatik yopish
+    btn.textContent = 'Показано';
+    btn.disabled = true;       // qayta ko'rsatmaydi
+    game.shown.add(i);
   }, VIEW_MS);
 }
-
-startBtn.addEventListener('click', startGame);
-resetBtn.addEventListener('click', ()=>{
-  playersArea.innerHTML = '';
-  currentGame = null;
-});
